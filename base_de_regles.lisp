@@ -79,21 +79,21 @@
 	(setq R3 '( (cat SCIENCE) (pole PTE) ))
 
 
-	(setq R31 '( ((pole PTE) (projet NON) (class RENCONTRE)) (asso COMUTEC) ))
+	(setq R31 '( ((pole PTE) (projet NON) (class INDUSTRIELS)) (asso COMUTEC) ))
 
 	(setq R32 '( ((pole PTE) (projet NON) (class CONFERENCE)) (asso TEDXUTCOMPIÈGNE) ))
 
-	(setq R33 '( ((pole PTE) (projet OUI) (class ROBOT)) (asso UTCOUPE) ))
+	(setq R33 '( ((pole PTE) (projet OUI) (class INDUSTRIELS)) (asso USEC) ))
 
-	(setq R34 '( ((pole PTE) (projet OUI) (class INDUSTRIELS)) (asso USEC) ))
+	(setq R34 '( ((pole PTE) (projet OUI) (class ROBOT)) (asso UTCOUPE) ))
 
 	(setq R351 '( ((pole PTE) (projet OUI) (class INFORMATIQUE)) (asso DATA_VENTURE) ))
 	(setq R352 '( ((pole PTE) (event OUI) (class COUCOURS)) (asso HACKATHON) ))
 
-	(setq R361 '( ((pole PTE) (projet OUI) (class AERONAUTIQUE)) (asso UTSPACE) ))
-	(setq R362 '( ((pole PTE) (projet NON) (class AERONAUTIQUE)) (type AERONAUTIQUE) ))
-		(setq R3621 '( ((type AERONAUTIQUE) (espace NON)) (asso UTCIEL) )) ;UTCIEL (aviation)
-		(setq R3622 '( ((type AERONAUTIQUE) (espace OUI)) (asso ORION) )) ;ORION (espace)
+	(setq R3611 '( ((pole PTE) (projet OUI) (espace NON) (class AERONAUTIQUE)) (asso NEW) ))
+	(setq R3612 '( ((pole PTE) (projet OUI) (espace OUI) (class AERONAUTIQUE)) (asso UTSPACE) ))
+	(setq R3621 '( ((pole PTE) (class AERONAUTIQUE) (projet NON) (espace NON)) (asso UTCIEL) )) ;UTCIEL (aviation)
+	(setq R3622 '( ((pole PTE) (class AERONAUTIQUE) (projet NON) (espace OUI)) (asso ORION) )) ;ORION (espace)
 
 	(setq R371 '( ((pole PTE) (projet OUI) (class BIOLOGIE)) (asso MYCÉLIUM) ))
 	(setq R372 '( ((pole PTE) (projet NON) (class BIOLOGIE)) (asso BIOMECANIQUE) ))
@@ -104,7 +104,7 @@
 (setq *regles* 
 	'(R1 R11 R12 R12 R13 R14 R111 R112 R113 R114 R115 R121 R122 R123 R131 R132 R133 R134 R135 R136 R141 R142 R143 R144 R145
 	R2 R211 R212 R221 R222 R223 R224 R225 R231 R232 R233 R234
-	R3 R31 R32 R33 R34 R351 R352 R361 R362 R3621 R3622 R371 R372)
+	R3 R31 R32 R33 R34 R351 R352 R3611 R3612 R3621 R3622 R371 R372)
 )
 
 (defun debut ()
@@ -279,13 +279,27 @@
 
 (defun scientifique()
 	(setq *bdf* (cons '(cat SCIENCE) *bdf*))
-	(write "Voulez vous réaliser un projet ? OUI NON")
-	(setq projet (read))
+	(write "Préférez vous ? la ROBOTIQUE, l'INFORMATIQUE, l'AERONAUTIQUE, la BIOLOGIE ou AUTRE chose ?")
+	(setq type (read))
 	(cond
-		((equal projet 'OUI)
-		)			
-		((equal projet 'NON)
-			(write "Voulez vous faire plutot des RENCONTRE ou des CONFERENCE ?")
+		((equal type 'ROBOTIQUE)
+		)
+		((equal type 'INFORMATIQUE)
+			(write "plutot PROJET ou EVENT ?")
+
+		)
+		((equal type 'AERONAUTIQUE)
+			(write "souhaitez vous réaliser un projet ? OUI / NON")
+			(write "ESPACE ou AVIONIQUE ?")
+
+		)
+		((equal type 'BIOLOGIE)
+			(write "souhaitez vous réaliser un projet ? OUI / NON")
+
+		)
+		((equal type 'AUTRE)
+			(write "Préférez vous ? la ROBOTIQUE, l'INFORMATIQUE, l'AERONAUTIQUE, la BIOLOGIE ou AUTRE chose ?")
+			(setq type (read))
 
 		)
 	)
