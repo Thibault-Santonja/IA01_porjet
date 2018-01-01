@@ -29,8 +29,11 @@ projet d'IA01 UTC
 ****************************************
 
 • "ls" : permet d'afficher le contenu du dossier courant ("ll" permet de faire un affichage "long" et plus précis) tu peux préciser un chemin d'accès après la commande
+
 • "cd" permet de se déplacer vers un autre répertoire "cd .." permet de remonter d'un dossier "cd ./nom_du_dossier" permet d'accéder à nom_du_dossier
+
 • "chmod" permet de changer les droits
+
 • "man <nom_de_la_fonction_" permet d'ouvrir le manuel d'une fonction (genre "man printf")
 
 Bref, il y en a masse autre mais c'est le tour de ce dont tu as besoin
