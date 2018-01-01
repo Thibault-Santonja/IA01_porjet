@@ -315,7 +315,7 @@
 			(setq *bdf* (cons '(class AERONAUTIQUE) *bdf*))
 			(write "Plutot dans les étoiles (espace) ? OUI / NON")
 			(setq espace (read))
-			(setq *bdf* (cons ('espace espace) *bdf*))	;;A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   
+			(setq *bdf* (cons ('espace espace) *bdf*))	;;A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   si ça ne fonctionne pas faire (cons '(espace OUI/NON) *bdf*) dans un if (comme le reste en gros)
 		)
 		((equal type 'BIOLOGIE)
 			(setq *bdf* (cons '(class BIOLOGIE) *bdf*))
@@ -458,8 +458,8 @@
 
 
 
-(setq R20 '( (cat SOLIDARITÉ) (pole PSEC) ))
-(setq R21 '( (cat CITOYENNETÉ) (pole PSEC) ))
-(setq R30 '( (cat TECHNOLOGIE) (PTE) ))
-(setq R31 '( (cat ENTREPRENARIAT) (PTE) ))
-(setq R40 '( (cat VIE-DU-CAMPUS) (PVC) ))
+	(setq R20 '( (cat SOLIDARITÉ) (pole PSEC) ))
+	(setq R21 '( (cat CITOYENNETÉ) (pole PSEC) ))
+	(setq R30 '( (cat TECHNOLOGIE) (PTE) ))
+	(setq R31 '( (cat ENTREPRENARIAT) (PTE) ))
+	(setq R40 '( (cat VIE-DU-CAMPUS) (PVC) ))
