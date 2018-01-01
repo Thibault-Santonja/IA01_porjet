@@ -78,25 +78,30 @@
 
 	(setq R3 '( (cat SCIENCE) (pole PTE) ))
 
+	(setq R301 '( ((event NON) (pole PTE)) (profil MAKER)))
+	(setq R302 '( ((event OUI) (pole PTE)) (profil TRANSMISSION)))
 
-	(setq R31 '( ((pole PTE) (projet NON) (class INDUSTRIELS)) (asso COMUTEC) ))
 
-	(setq R32 '( ((pole PTE) (projet NON) (class CONFERENCE)) (asso TEDXUTCOMPIÈGNE) ))
+	(setq R31 '( ((profil MAKER) (class INDUSTRIELS)) (asso USEC) ))
+	(setq R32 '( ((profil TRANSMISSION) (class INDUSTRIELS)) (asso COMUTEC) ))
 
-	(setq R33 '( ((pole PTE) (projet OUI) (class INDUSTRIELS)) (asso USEC) ))
+	(setq R33 '( ((profil MAKER) (class ROBOT)) (asso UTCOUPE) ))
+	(setq R34 '( ((profil TRANSMISSION) (class ROBOT)) (asso TEDXUTCOMPIÈGNE) ))
 
-	(setq R34 '( ((pole PTE) (projet OUI) (class ROBOT)) (asso UTCOUPE) ))
+	(setq R351 '( ((profil MAKER) (class INFORMATIQUE)) (asso DATA_VENTURE) ))
+	(setq R352 '( ((profil TRANSMISSION) (class INFORMATIQUE)) (asso HACKATHON) ))
 
-	(setq R351 '( ((pole PTE) (projet OUI) (class INFORMATIQUE)) (asso DATA_VENTURE) ))
-	(setq R352 '( ((pole PTE) (event OUI) (class COUCOURS)) (asso HACKATHON) ))
+	(setq R3611 '( ((profil MAKER) (class AERONAUTIQUE) (espace NON)) (asso FABLAB) ))
+	(setq R3612 '( ((profil MAKER) (class AERONAUTIQUE) (espace OUI)) (asso UTSPACE) ))
+	(setq R3621 '( ((profil TRANSMISSION) (class AERONAUTIQUE) (espace NON)) (asso UTCIEL) )) ;UTCIEL (aviation)
+	(setq R3622 '( ((profil TRANSMISSION) (class AERONAUTIQUE) (espace OUI)) (asso ORION) )) ;ORION (espace)
 
-	(setq R3611 '( ((pole PTE) (projet OUI) (espace NON) (class AERONAUTIQUE)) (asso NEW) ))
-	(setq R3612 '( ((pole PTE) (projet OUI) (espace OUI) (class AERONAUTIQUE)) (asso UTSPACE) ))
-	(setq R3621 '( ((pole PTE) (class AERONAUTIQUE) (projet NON) (espace NON)) (asso UTCIEL) )) ;UTCIEL (aviation)
-	(setq R3622 '( ((pole PTE) (class AERONAUTIQUE) (projet NON) (espace OUI)) (asso ORION) )) ;ORION (espace)
+	(setq R371 '( ((profil MAKER) (class BIOLOGIE)) (asso MYCÉLIUM) ))
+	(setq R372 '( ((profil TRANSMISSION) (class BIOLOGIE)) (asso BIOMECANIQUE) ))
 
-	(setq R371 '( ((pole PTE) (projet OUI) (class BIOLOGIE)) (asso MYCÉLIUM) ))
-	(setq R372 '( ((pole PTE) (projet NON) (class BIOLOGIE)) (asso BIOMECANIQUE) ))
+	(setq R381 '( ((profil MAKER) (class AUCUNE)) (asso FABLAB) ))
+	(setq R382 '( ((profil TRANSMISSION) (class AUCUNE)) (asso TEDXUTCOMPIÈGNE) ))
+
 
 
 
@@ -104,7 +109,7 @@
 (setq *regles* 
 	'(R1 R11 R12 R12 R13 R14 R111 R112 R113 R114 R115 R121 R122 R123 R131 R132 R133 R134 R135 R136 R141 R142 R143 R144 R145
 	R2 R211 R212 R221 R222 R223 R224 R225 R231 R232 R233 R234
-	R3 R31 R32 R33 R34 R351 R352 R3611 R3612 R3621 R3622 R371 R372)
+	R3 R301 R302 R31 R32 R33 R34 R351 R352 R3611 R3612 R3621 R3622 R371 R372 R381 R382)
 )
 
 (defun debut ()
@@ -277,32 +282,49 @@
 	)
 )
 
-(defun scientifique()
-	(setq *bdf* (cons '(cat SCIENCE) *bdf*))
-	(write "Préférez vous ? la ROBOTIQUE, l'INFORMATIQUE, l'AERONAUTIQUE, la BIOLOGIE ou AUTRE chose ?")
+(defun scientifique()											; Gestion partie PTE
+	(setq *bdf* (cons '(cat SCIENCE) *bdf*))					; insertion dans la base de fait de la categorie science (qui amènera à déterminer PTE)
+	(write "Souhaiter vous réaliser / construire / concevoir quelque chose ? OUI / NON")
+	(setq proj (read))											; pour savoir s'il est plutot MAKER ou dans la TRANSMISSION de connaissances
+	;(if 
+	;	(NOT (AND 	(equal proj 'OUI) 
+	;				(equal proj 'NON))
+	;	) 
+	;	(progn 
+			(write "ERROR:proj")
+			(return-from NULL)
+	;	)
+		(if (equal proj 'OUI)
+			(setq *bdf* (cons '(event NON) *bdf*))				; ajoutons (event *reponse*) à *bdf* (base de fait)
+			(setq *bdf* (cons '(event OUI) *bdf*))
+		)
+	;)
+	(write "Préférez vous ? etre proche des INDUSTRIELS ou un domaine précis tel que la ROBOTIQUE, l'INFORMATIQUE, l'AERONAUTIQUE, la BIOLOGIE ou AUTRE chose encore ?")
 	(setq type (read))
 	(cond
+		((equal type 'INDUSTRIELS)
+			(setq *bdf* (cons '(class INDUSTRIELS) *bdf*))			; s'il préfère INDUSTRIELS on l'ajoute à la base de fait, avec les précédentes questions normalement on est en capacité à déterminer une asso
+		)
 		((equal type 'ROBOTIQUE)
+			(setq *bdf* (cons '(class ROBOT) *bdf*))			; s'il préfère la robotique on l'ajoute à la base de fait, avec les précédentes questions normalement on est en capacité à déterminer une asso
 		)
 		((equal type 'INFORMATIQUE)
-			(write "plutot PROJET ou EVENT ?")
-
+			(setq *bdf* (cons '(class INFORMATIQUE) *bdf*))
 		)
 		((equal type 'AERONAUTIQUE)
-			(write "souhaitez vous réaliser un projet ? OUI / NON")
-			(write "ESPACE ou AVIONIQUE ?")
-
+			(setq *bdf* (cons '(class AERONAUTIQUE) *bdf*))
+			(write "Plutot dans les étoiles (espace) ? OUI / NON")
+			(setq espace (read))
+			(setq *bdf* (cons ('espace espace) *bdf*))	;;A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   
 		)
 		((equal type 'BIOLOGIE)
-			(write "souhaitez vous réaliser un projet ? OUI / NON")
-
+			(setq *bdf* (cons '(class BIOLOGIE) *bdf*))
 		)
 		((equal type 'AUTRE)
-			(write "Préférez vous ? la ROBOTIQUE, l'INFORMATIQUE, l'AERONAUTIQUE, la BIOLOGIE ou AUTRE chose ?")
-			(setq type (read))
-
+			(setq *bdf* (cons '(class AUCUNE) *bdf*))
 		)
 	)
+	; A TESTER NORMALEMENT AVEC TOUT CECI C'EST CENSER FOCNTIONNER
 )
 
 
@@ -403,7 +425,11 @@
 
 
 
-;PÔLE VIE DU CAMPUS
+;******************************************************
+;**************** PÔLE VIE DU CAMPUS ******************
+;******************************************************
+
+;PÔLE VIE DU CAMPUS A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE 
 
 	(setq R401 '( ((pole VDC) (nourriture charcuterie)) (asso ) )) ;CHARC'UTC (nourriture charcuterie)
 	(setq R402 '( ((pole VDC) (art cinéma)) (asso CINEMUTC) )) ;CINEMUTC (art cinéma)
