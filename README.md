@@ -16,9 +16,12 @@ projet d'IA01 UTC
 
 • PUSH : quand tu veux mettre en ligne un fichier, tu fais :
 
-  " git add <nom du fichier> " exemple "git add main.c" (tu peux aussi tout add en faisant "git add --all")
-  " git commit -m "TON MESSAGE" " 
-  " git push origin master " (tu push de l'origin vers la branche master (on a que cette branche là)) tu peux aussi écrire "git push"
+  1. " git add <nom du fichier> " exemple "git add main.c" (tu peux aussi tout add en faisant "git add --all")
+  
+  2. " git commit -m "TON MESSAGE" " 
+  
+  3. " git push origin master " (tu push de l'origin vers la branche master (on a que cette branche là)) tu peux aussi écrire "git push"
+
 
 • PULL : pour récupérer ce qui est déjà en ligne dans git, tu fais :
   " git pull "
