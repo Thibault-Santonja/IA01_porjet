@@ -114,12 +114,14 @@
 
 (defun debut ()
 
-  (format t "~%~%Bienvenue! Nous allons vous guider dans le choix de vos assos.~%~%")
+	(format t "~%~%Bienvenue! Nous allons vous guider dans le choix de vos assos.~%~%")
+
+	(setq *bdf* '())
 
 	(write "Que préférez-vous parmis ces choix : ART, CITOYENNETE et SCIENCE ?")
 	(setq pole (read))
 	(cond
-		((equal pole 'ART) (art))
+		((equal pole 'ART) (artiste))
 		((equal pole 'CITOYENNETE) (citoyen))
 		((equal pole 'SCIENCE) (scientifique))
 	)
@@ -291,8 +293,8 @@
 	;				(equal proj 'NON))
 	;	) 
 	;	(progn 
-			(write "ERROR:proj")
-			(return-from NULL)
+	;		(write "ERROR:proj")
+	;		(return-from NIL)
 	;	)
 		(if (equal proj 'OUI)
 			(setq *bdf* (cons '(event NON) *bdf*))				; ajoutons (event *reponse*) à *bdf* (base de fait)
