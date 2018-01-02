@@ -1,14 +1,7 @@
 # IA01_porjet
-projet d'IA01 UTC
+projet d'IA01 / AI02 à l'UTC. Pour commencer voici quelques petits tuto pour bien utiliser Git et UNIX dans le cadre de la programmation (UNIX n'est pas obligatoire)
 
-****************************************
-************** COMPILATION *************
-****************************************
 
-1. Pour compiler sous UNIX va dans le terminal
-2. Dans le terminal avec la commande "cd " accéde à ton dossier où tu as le projet & le makefile (en précisent le chemin, par exemple : " cd Bureau/AC01/TP1 ")
-3. Utilise la commande "make" pour compiler (les flags de compilation (wall) sont déjà inclus dans le makefile)
-4. Pour lancer le programme fait "./<nom_du_programme>" ici " ./TP1_liste_chainee "
 
 ****************************************
 ************* UTILISER GIT *************
@@ -25,6 +18,30 @@ projet d'IA01 UTC
 
 • PULL : pour récupérer ce qui est déjà en ligne dans git, tu fais :
   " git pull "
+  
+  
+• New Branch : de base nous travaillons sur la branche principale nommée master. mais on peut travailler en parallèle sur deux branches distinctes, pour créer et naviguer entre les branches :
+
+  1. " git branch <nomDeTaNouvelleBranche> " permet de créer une nouvelle branche ayant pour nom <nomDeTaNouvelleBranche>. les modifications de cette branche ne concernerons que celle-ci tant que l'on n'a pas fait un MERGE (unification) entre deux branche
+  
+  2. " git checkout <nomDUneBranche> " (permet de changer de la branche actuelle à la branche demandé <nomDUneBranche> (ATTENTION 0 LA CASSE (majuscules minuscule) sinon soit ça ne fonctionnne pas, soit ça créer (possiblement) une nouvelle branche).)
+  
+  
+• MERGE : Pour réunir les modifications de deux branches distinctes en une seule, ATTENTION AU POSSIBLES CONFLITS !!! (si les deux branches ont modifié la même chose).) 
+  
+  
+  
+  
+****************************************
+************** COMPILATION *************
+****************************************
+
+1. Pour compiler sous UNIX va dans le terminal
+2. Dans le terminal avec la commande "cd " accéde à ton dossier où tu as le projet & le makefile (en précisent le chemin, par exemple : " cd Bureau/AC01/TP1 ")
+3. Utilise la commande "make" pour compiler (les flags de compilation (wall) sont déjà inclus dans le makefile)
+4. Pour lancer le programme fait "./<nom_du_programme>" ici " ./TP1_liste_chainee "
+
+
 
 
 ****************************************
