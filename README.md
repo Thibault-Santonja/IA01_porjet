@@ -7,6 +7,22 @@ projet d'IA01 / AI02 à l'UTC. Pour commencer voici quelques petits tuto pour bi
 ************* UTILISER GIT *************
 ****************************************
 
+• GIT : paramétrer son git
+
+  1. git config --global user.name "John Doe"
+
+  2. git config --global user.email johndoe@example.com
+
+
+
+• début projet : télécharger un projet
+
+  1. si tu dois DL un dépot : " git clone "lien-vers-le-depot" "
+  
+  2. si tu créés un dépot : https://git-scm.com/book/fr/v1/Les-bases-de-Git-D%C3%A9marrer-un-d%C3%A9p%C3%B4t-Git (pense à ajouter tes collaborateur dans les paramètres)
+  
+
+
 • PUSH : quand tu veux mettre en ligne un fichier, tu fais :
 
   1. " git add <nom du fichier> " exemple "git add main.c" (tu peux aussi tout add en faisant "git add --all")
@@ -14,6 +30,8 @@ projet d'IA01 / AI02 à l'UTC. Pour commencer voici quelques petits tuto pour bi
   2. " git commit -m "TON MESSAGE" " 
   
   3. " git push origin master " (tu push de l'origin vers la branche master (on a que cette branche là)) tu peux aussi écrire "git push"
+
+git add c'est pour ajouter les fichier --- git commit c'est pour creer un commit "un message" --- git push c'est pour envoyer ton commit (ton "message")
 
 
 • PULL : pour récupérer ce qui est déjà en ligne dans git, tu fais :
