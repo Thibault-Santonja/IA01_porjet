@@ -13,7 +13,7 @@
 ;*********                                 ************
 ;******************************************************
 ;******************************************************
-; j'ai modifie un truc loul
+
 
 
 
@@ -555,10 +555,17 @@
 
 
 ;******************************************************
-;*********** MOTEUR INFÉRENCE PROFONDEUR **************
+;************* MOTEUR INFÉRENCE LARGEUR ***************
 ;******************************************************
 
 
+
+
+;******************************************************
+;*********** MOTEUR INFÉRENCE PROFONDEUR **************
+;******************************************************
+
+#||
 	;; Tant qu'il y a une règle candidate à tester, on relance moteur_profondeur
 	(defun lancement_moteur_profondeur ()
 		(loop while (equal (moteur_profondeur) t) do
@@ -585,18 +592,66 @@
 		) 
 		nil
 	) 
+||#
 
+	(defun lancement_moteur_profondeur ()
+		(write "AVANT ou ARRIERE ?")
+		(setq chainage (read))
+		(if (equal chainage 'AVANT)
+			(moteur_profondeur_avant)
+			(moteur_profondeur_arriere)
+		)
+		(loop while (equal (moteur_profondeur) t) do
+			(moteur_profondeur)
+			(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
+		)
+	)
 
+	(defun moteur_profondeur_avant ()
+(while (null (cdr (assoc 'genre bf))) 
+			(setq ok NIL)
+			(dolist (r br)
+				(if (applicable (eval r) *faits*)
+					(progn
+						(setq ok t)
+						(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))   
+						(setq br (remove r br))  	;supprimer regle de br
+						(return-from moteur_avant_profondeur (moteur_avant_profondeur br bf))
+						)
+					)
+				)
+			(if (equal ok NIL) (return-from moteur_avant_profondeur (format t "Le moteur n'a pas pu trouver de genre correspondant dans la base de donnees~&~&")))
+		)
 
+		(if (member (cadr (assoc 'genre bf)) gSousgenres)
+			(dolist (r br )				(if (and (applicable (eval r) *faits* ) (member (assoc 'genre bf) (car (eval r)) :test #'equal))
+					(progn
+						(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))
+						(return-from moteur_avant_profondeur (format t "~& ~& Le sous-genre de la musique est : ~a ~& ~& ~&"(car (but (eval r)))))
+						)
+				)
+			)
+		)
+		(format t "~& ~& Le genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'genre bf)))
+	)
+
+	(defun moteur_profondeur_arriere ()
+
+	)
 
 ;******************************************************
 ;***************** FONCTION "MAIN" ********************
 ;******************************************************
 
-	(defun start_profondeur ()
+	(defun start ()
 		(init)								; initialisation des listes *bdf* (base de fait) et parcouru
 		(debut)								; détermination du profil utilisateur et création des datas dans la base de fait
-		(lancement_moteur_profondeur)
+		(write "PROFONDEUR ou LARGEUR ?")
+		(setq chainage (read))
+		(if (equal chainage 'PROFONDEUR)
+			(lancement_moteur_profondeur)
+			(lancement_moteur_largeur)
+		)
 		(affichage)
 	)
 
