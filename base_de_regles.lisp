@@ -558,41 +558,36 @@
 ;************* MOTEUR INFÉRENCE LARGEUR ***************
 ;******************************************************
 
-
-
-
-;******************************************************
-;*********** MOTEUR INFÉRENCE PROFONDEUR **************
-;******************************************************
-
-#||
-	;; Tant qu'il y a une règle candidate à tester, on relance moteur_profondeur
-	(defun lancement_moteur_profondeur ()
+	(defun lancement_moteur_largeur()
+		(write "AVANT ou ARRIERE ?")
+		(setq chainage (read))
+		(if (equal chainage 'AVANT)
+			(moteur_largeur_avant)
+			(moteur_largeur_arriere)
+		)
 		(loop while (equal (moteur_profondeur) t) do
 			(moteur_profondeur)
 			(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
 		)
 	)
 
-	;; Parcourt l'arbre depuis la debut et s'arrete a la premiere regle candidate
-	(defun moteur_profondeur ()
-		(dolist (regle *regles*)
-			(write "2")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
-			(cond 
-				(
-					(and (not (member regle *parcouru*)) (equal (verif regle) t))
-					(dolist (conclusion (conclu (eval regle)))
-						(push conclusion *bdf*)
-					)
-					(push regle *parcouru*)
-					(return-from moteur_profondeur t)
-				)
-				(t nil)
-			)
-		) 
-		nil
-	) 
-||#
+
+	(defun moteur_largeur_avant ()
+
+	)
+
+
+	(defun moteur_largeur_arriere () ; compliqué à faire dans notre cas et avec assez peu d'intéret. (il faudrait lister toutes le asso, qu'on en selectionne une et qu'on lui donn ses gouts => bizarre)
+
+	)
+
+
+
+
+
+;******************************************************
+;*********** MOTEUR INFÉRENCE PROFONDEUR **************
+;******************************************************
 
 	(defun lancement_moteur_profondeur ()
 		(write "AVANT ou ARRIERE ?")
@@ -635,7 +630,7 @@
 		(format t "~& ~& Le genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'genre bf)))
 	)
 
-	(defun moteur_profondeur_arriere ()
+	(defun moteur_profondeur_arriere ()	; compliqué à faire dans notre cas et avec assez peu d'intéret. (il faudrait lister toutes le asso, qu'on en selectionne une et qu'on lui donn ses gouts => bizarre)
 
 	)
 
@@ -736,3 +731,33 @@
 			(format t "~& ~& Le genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'genre bf)))
 		)
 	)
+
+
+#||
+	;; Tant qu'il y a une règle candidate à tester, on relance moteur_profondeur
+	(defun lancement_moteur_profondeur ()
+		(loop while (equal (moteur_profondeur) t) do
+			(moteur_profondeur)
+			(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
+		)
+	)
+
+	;; Parcourt l'arbre depuis la debut et s'arrete a la premiere regle candidate
+	(defun moteur_profondeur ()
+		(dolist (regle *regles*)
+			(write "2")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
+			(cond 
+				(
+					(and (not (member regle *parcouru*)) (equal (verif regle) t))
+					(dolist (conclusion (conclu (eval regle)))
+						(push conclusion *bdf*)
+					)
+					(push regle *parcouru*)
+					(return-from moteur_profondeur t)
+				)
+				(t nil)
+			)
+		) 
+		nil
+	) 
+||#
