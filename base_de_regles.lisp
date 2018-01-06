@@ -697,3 +697,42 @@
 	(setq R30 '( (cat TECHNOLOGIE) (PTE) ))
 	(setq R31 '( (cat ENTREPRENARIAT) (PTE) ))
 	(setq R40 '( (cat VIE-DU-CAMPUS) (PVC) ))
+
+
+
+
+	;;; https://github.com/NormandErwan/utc-ia01-expert-system/blob/master/expert-system.cl
+;;; https://github.com/Anaig/IA01/blob/master/systeme.cl
+;;; https://github.com/alexis-ung/diapason/blob/master/TP-3-FINAL.cl
+	(defun moteur_avant_largeur(*regles* *faits*) 	;largeur
+		(let ((bf *faits*) (br *regles*) (ok NIL))
+			(while (null (cdr (assoc 'genre bf))) 
+				(setq ok NIL)
+				(dolist (r br)
+					(if (applicable (eval r) *faits*)
+						(progn
+							(setq ok t)
+							(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))   
+							(setq br (remove r br))  	;supprimer regle de br 
+							)
+						)
+					)
+				(if (equal ok NIL) (return-from moteur_avant_largeur (format t "Le moteur n'a pas pu trouver de genre correspondant dans la base de donnees~&~&")))
+			)
+
+			(if (member (cadr (assoc 'genre bf)) gSousgenres)
+				(if (not (null (cdr (assoc 'sous-genre *faits*))))
+					(return-from moteur_avant_largeur (format t "~& ~& Le sous-genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'sous-genre *faits*))))
+					(dolist (r br)
+						(if (and (applicable (eval r) *faits* ) (member (assoc 'genre bf) (car (eval r)) :test #'equal))
+							(progn
+								(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))
+								(return-from moteur_avant_profondeur (format t "~& ~& Le sous-genre de la musique est : ~a ~& ~& ~&"(car (but (eval r)))))
+							)
+						)
+					)
+				)
+			)
+			(format t "~& ~& Le genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'genre bf)))
+		)
+	)
