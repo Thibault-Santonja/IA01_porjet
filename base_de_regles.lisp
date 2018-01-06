@@ -1,4 +1,4 @@
-﻿;******************************************************
+;******************************************************
 ;******************************************************
 ;*********                                 ************
 ;*********         SYSTEME EXPERT          ************
@@ -27,7 +27,7 @@
 		;********* PÔLE ARTISTIQUE ET ÉVÈNEMENTIEL ************
 		;******************************************************
 
-			(setq R1 '( (cat ART) (pole PAE) ))
+			(setq R1 '( (cat ART) (pole PAE) ) )
 
 			(setq R11 '( ((pole PAE) (class EVENEMENTIEL)) (type EVENT-ARTISTIQUE) ))
 			(setq R12 '( ((pole PAE) (class SPORTIF)) (type SPORT-ARTISTIQUE) ))
@@ -510,8 +510,9 @@
 	;; initialisation des listes *bdf* (base de fait) et parcouru
 
 	(defun init ()
-		(setq *parcouru* '())
-		(setq *bdf* '())
+		(defvar *parcouru* '())
+		(defvar *bdf* '())
+		(defvar *rc* '())
 	 )
 
 
@@ -547,6 +548,25 @@
 		)
 	 )
 
+	; Ajoute les regles candidates dans la liste *rc* => regles appliquables à un moment donné 
+	(defun regles_candidates ()
+		(let ((flag t))
+	        (dolist (regle *regles*)
+	            (dolist pre (premisse regle)
+	            	(if (not (member pre *bdf*)) (setf flag NIL))
+	            )
+		       	(if (flag) (push regle *rc*))
+		       	(setf flag t)
+	        )
+	    )
+    )
+
+	; Ajoute la conclusion d'une règle applicable dans la base de faits
+    (defun explore (regle)
+    	(reverse *bdf*)
+    	(push (conclu regle) *bdf*)
+    	(reverse *bdf*)
+    )
 
 	;; fonctions "peu utile" permettant simplement de mieux comprendre le code
 	(defun premisse (regle)	(car regle)	)	; renvoie la prémisse d'une règle
@@ -565,10 +585,10 @@
 			(moteur_largeur_avant)
 			(moteur_largeur_arriere)
 		)
-		(loop while (equal (moteur_profondeur) t) do
-			(moteur_profondeur)
-			(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
-		)
+		;(loop while (equal (moteur_profondeur) t) do
+		;	(moteur_profondeur)
+		;	(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
+		;)
 	)
 
 
@@ -603,7 +623,7 @@
 	)
 
 	(defun moteur_profondeur_avant ()
-(while (null (cdr (assoc 'genre bf))) 
+		(while (null (cdr (assoc 'genre bf))) 
 			(setq ok NIL)
 			(dolist (r br)
 				(if (applicable (eval r) *faits*)
@@ -641,6 +661,7 @@
 	(defun start ()
 		(init)								; initialisation des listes *bdf* (base de fait) et parcouru
 		(debut)								; détermination du profil utilisateur et création des datas dans la base de fait
+		(regles_candidates)
 		(write "PROFONDEUR ou LARGEUR ?")
 		(setq chainage (read))
 		(if (equal chainage 'PROFONDEUR)
