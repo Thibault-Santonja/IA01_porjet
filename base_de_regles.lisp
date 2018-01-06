@@ -593,7 +593,21 @@
 
 
 	(defun moteur_largeur_avant ()
-
+		(let ((regle))
+			(loop while (AND (not (equal *rc* '())) (not (assoc 'asso *bdf*))) do 
+				(setf regle (car *rc*))
+				(reverse *rc*)
+				(setf *rc* (cdr *rc*))
+				(reverse *rc*)
+				(push regle *re*)
+				(explore regle)
+				(regles_candidates)
+			)
+		)
+		(if (assoc 'asso *bdf*)
+			T
+			NIL
+		)
 	)
 
 
@@ -621,8 +635,20 @@
 		;)
 	)
 
-
 	(defun moteur_profondeur_avant ()
+		(let ((regle))
+			(loop while (AND (not (equal *rc* '())) (not (assoc 'asso *bdf*))) do 
+				(setf regle (car *rc*))
+				(setf *rc* (cdr *rc*))
+				(push regle *re*)
+				(explore regle)
+				(regles_candidates)
+			)
+		)
+		(if (assoc 'asso *bdf*)
+			T
+			NIL
+		)
 	)
 
 
@@ -800,4 +826,13 @@
 			)
 		)
 		(format t "~& ~& Le genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'genre bf)))
+	)
+
+
+
+
+
+	(progn 
+		(setq re 400)
+		(loop while (< re 450) do (write re) (setf re (+ re 1)))
 	)
