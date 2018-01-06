@@ -608,7 +608,6 @@
 ;******************************************************
 ;*********** MOTEUR INFÉRENCE PROFONDEUR **************
 ;******************************************************
-
 	(defun lancement_moteur_profondeur ()
 		(write "AVANT ou ARRIERE ?")
 		(setq chainage (read))
@@ -616,42 +615,18 @@
 			(moteur_profondeur_avant)
 			(moteur_profondeur_arriere)
 		)
-		(loop while (equal (moteur_profondeur) t) do
-			(moteur_profondeur)
-			(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
-		)
+		;(loop while (equal (moteur_profondeur) t) do
+		;	(moteur_profondeur)
+		;	(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
+		;)
 	)
+
 
 	(defun moteur_profondeur_avant ()
-		(while (null (cdr (assoc 'genre bf))) 
-			(setq ok NIL)
-			(dolist (r br)
-				(if (applicable (eval r) *faits*)
-					(progn
-						(setq ok t)
-						(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))   
-						(setq br (remove r br))  	;supprimer regle de br
-						(return-from moteur_avant_profondeur (moteur_avant_profondeur br bf))
-						)
-					)
-				)
-			(if (equal ok NIL) (return-from moteur_avant_profondeur (format t "Le moteur n'a pas pu trouver de genre correspondant dans la base de donnees~&~&")))
-		)
-
-		(if (member (cadr (assoc 'genre bf)) gSousgenres)
-			(dolist (r br )				(if (and (applicable (eval r) *faits* ) (member (assoc 'genre bf) (car (eval r)) :test #'equal))
-					(progn
-						(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))
-						(return-from moteur_avant_profondeur (format t "~& ~& Le sous-genre de la musique est : ~a ~& ~& ~&"(car (but (eval r)))))
-						)
-				)
-			)
-		)
-		(format t "~& ~& Le genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'genre bf)))
 	)
 
-	(defun moteur_profondeur_arriere ()	; compliqué à faire dans notre cas et avec assez peu d'intéret. (il faudrait lister toutes le asso, qu'on en selectionne une et qu'on lui donn ses gouts => bizarre)
 
+	(defun moteur_profondeur_arriere ()	; compliqué à faire dans notre cas et avec assez peu d'intéret. (il faudrait lister toutes le asso, qu'on en selectionne une et qu'on lui donn ses gouts => bizarre)
 	)
 
 ;******************************************************
@@ -782,3 +757,47 @@
 		nil
 	) 
 ||#
+
+
+
+
+	(defun lancement_moteur_profondeur ()
+		(write "AVANT ou ARRIERE ?")
+		(setq chainage (read))
+		(if (equal chainage 'AVANT)
+			(moteur_profondeur_avant)
+			(moteur_profondeur_arriere)
+		)
+		(loop while (equal (moteur_profondeur) t) do
+			(moteur_profondeur)
+			(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
+		)
+	)
+
+	(defun moteur_profondeur_avant ()
+		(while (null (cdr (assoc 'genre bf))) 
+			(setq ok NIL)
+			(dolist (r br)
+				(if (applicable (eval r) *faits*)
+					(progn
+						(setq ok t)
+						(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))   
+						(setq br (remove r br))  	;supprimer regle de br
+						(return-from moteur_avant_profondeur (moteur_avant_profondeur br bf))
+						)
+					)
+				)
+			(if (equal ok NIL) (return-from moteur_avant_profondeur (format t "Le moteur n'a pas pu trouver de genre correspondant dans la base de donnees~&~&")))
+		)
+
+		(if (member (cadr (assoc 'genre bf)) gSousgenres)
+			(dolist (r br )				(if (and (applicable (eval r) *faits* ) (member (assoc 'genre bf) (car (eval r)) :test #'equal))
+					(progn
+						(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))
+						(return-from moteur_avant_profondeur (format t "~& ~& Le sous-genre de la musique est : ~a ~& ~& ~&"(car (but (eval r)))))
+						)
+				)
+			)
+		)
+		(format t "~& ~& Le genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'genre bf)))
+	)
