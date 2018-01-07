@@ -95,7 +95,7 @@
 			(setq R231 '( ((type AIDE-HUMANITAIRE) (pays MONDE)) (asso INGÉNIEURS_SANS_FRONTIÈRES) )) ;INGÉNIEURS SANS FRONTIÈRES (aide humanitaire)
 			(setq R232 '( ((type AIDE-HUMANITAIRE) (pays INDE)) (asso SOLEILS_EN_INDE) )) ;SOLEILS EN INDE (aide inde)
 			(setq R233 '( ((type AIDE-HUMANITAIRE) (pays NEPAL)) (asso TOIT_POUR_LE_NEPAL) )) ;TOIT POUR LE NEPAL (aide nepal)
-			(setq R234 '( ((type AIDE-HUMANITAIRE) (pays AFRIQUE) (asso UT_AFRICA) ))) ;UT'AFRICA (aide afrique)
+			(setq R234 '( ((type AIDE-HUMANITAIRE) (pays AFRIQUE)) (asso UT_AFRICA) )) ;UT'AFRICA (aide afrique)
 
 
 
@@ -107,7 +107,7 @@
 
 			(setq R3 '( ((cat SCIENCE)) (pole PTE) ))
 
-			(setq R301 '( ((event NON) (pole PTE)) (profil MAKER)))
+			(setq R301 '( ((event NON) (pole PTE)) (profil MAKER) ))
 			(setq R302 '( ((event OUI) (pole PTE)) (profil TRANSMISSION)))
 
 
@@ -138,13 +138,13 @@
 		;******************************************************
 		;**************** PÔLE VIE DU CAMPUS ******************
 		;******************************************************
-			(setq R4 '( ((cat CAMPUS)) (pole PVC)))
+			(setq R4 '( ((cat CAMPUS)) (pole PVC) ))
 
 			;****************** type NOURRITURE **********************
 			(setq R401 '( ((pole VDC) (type NOURRITURE) (genre CHARCUTERIE)) (asso CHARCUTC) )) ;CHARC'UTC (nourriture charcuterie)
 			(setq R402 '( ((pole VDC) (type NOURRITURE) (genre VIN)) (asso OENOLOGIE) )) ;CLUB OENOLOGIE (nourriture vin)
 			(setq R403 '( ((pole VDC) (type NOURRITURE) (genre CUISINE)) (asso COOK_UTC) )) ;COOK'UTC (nourriture cuisine)
-			(setq R404 '( ((pole VDC) ((type NOURRITURE) (genre BIERE))) (asso VOIE_DU_HOUBLON) )) ;LA VOIE DU HOUBLON (sport course biere)
+			(setq R404 '( ((pole VDC) (type NOURRITURE) (genre BIERE)) (asso VOIE_DU_HOUBLON) )) ;LA VOIE DU HOUBLON (sport course biere)
 			(setq R405 '( ((pole VDC) (type NOURRITURE) (genre TOUT)) (asso PIC_ASSO ) )) ;PIC'ASSO (foyer étudiant)
 
 			;****************** type CINEMA ******************************
@@ -477,7 +477,7 @@
 				(setq *bdf* (cons '(class AERONAUTIQUE) *bdf*))
 				(write "Plutot dans les étoiles (espace) ? OUI / NON")
 				(setq espace (read))
-				(if (equal espace 'OUI) (setq *bdf* (cons '(espace espace) *bdf*)) *bdf*)	;; A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   A TESTER   si ça ne fonctionne pas faire (cons '(espace OUI/NON) *bdf*) dans un if (comme le reste en gros)
+				(if (equal espace 'OUI) (setq *bdf* (cons '(espace OUI) *bdf*)) (setq *bdf* (cons '(espace NON) *bdf*)))
 			)
 			((equal type 'BIOLOGIE)
 				(setq *bdf* (cons '(class BIOLOGIE) *bdf*))
@@ -491,7 +491,7 @@
 
 	(defun debut ()
 
-	  (format t "~%~%Bienvenue! Nous allons vous guider dans le choix de vos assos.~%~%")
+		(format t "~%~%Bienvenue! Nous allons vous guider dans le choix de vos assos.~%~%")
 
 		(write "Que préférez-vous parmis ces choix : ART, CITOYENNETE, vie du CAMPUS et SCIENCE ?")
 		(setq pole (read))
@@ -516,6 +516,11 @@
 		(defvar *parcouru* '())
 		(defvar *bdf* '())
 		(defvar *rc* '())
+		(defvar *re* '())
+		(setq *parcouru* '())
+		(setq *bdf* '())
+		(setq *rc* '())
+		(setq *re* '())
 	 )
 
 
@@ -533,10 +538,9 @@
 	;; Affiche le resultat depuis la base de faits
 	(defun affichage ()
 		(format t "~%~%Suite à toutes vos réponses, nous vous conseillons de rejoindre : ~%~%")
-		(loop for regle in *bdf* until (equal (premisse regle) 'asso)	do 
-			(cond 
-				((equal (premisse regle) 'asso) (print (conclu regle)))
-				(t (print regle))
+		(dolist (elem *bdf*)
+			(if (equal (car elem) 'ASSO)
+				(write (cdr elem))
 			)
 		)
 	 )
@@ -555,20 +559,27 @@
 	(defun regles_candidates ()
 		(let ((flag t))
 	        (dolist (regle *regles*)
-	            (dolist (pre (premisse (eval regle)))
-	            	(write pre)
-	            	(write " - ")
+				;(format t "~% regle : ")
+	    		;(write regle)
+	            (dolist (pre (car (eval regle)))
+					;(format t "~% --- premisse : ")
+	            	;(write pre)
 	            	(if (not (member_bdf pre *bdf*)) (setf flag NIL))
 	            )
-	            (write "~%~% - ")
-		       	(if (eq flag T) (push regle *rc*))
+		       	(if (AND (eq flag T) (not (member regle *re*))) (push regle *rc*))
 		       	(setf flag T)
 	        )
 	    )
     )
 
     (defun member_bdf (premisse *bdf*)
+    	;(format t "~% member_bdf --- premisse : ")
+	    ;(write premisse)
+    	;(format t "~% member_bdf --- bdf : ")
+	    ;(write *bdf*)
     	(dolist (fait *bdf*)
+    		;(format t "~% member_bdf --- fait : ")
+	   		;(write fait)
     		(if (equal (car premisse) (car fait))
     			(if (equal (cdr premisse) (cdr fait))
     				(return-from member_bdf T)
@@ -655,7 +666,31 @@
 				(setf regle (car *rc*))
 				(setf *rc* (cdr *rc*))
 				(push regle *re*)
-				(explore regle)
+				;(write "ICI2 ?")
+				(write regle)
+				(explore (eval regle))
+				;(write "ICI 3?")
+				(regles_candidates)
+			)
+		)
+		(if (assoc 'asso *bdf*)
+			T
+			NIL
+		)
+	)
+
+
+	(defun moteur_profondeur_avant ()
+		(let ((regle) (i 0))
+			(loop while (AND (AND (not (equal *rc* '())) (not (assoc 'asso *bdf*))) (< i 6)) do 
+				(setf i (+ i 1))
+				(setf regle (car *rc*))
+				(setf *rc* (cdr *rc*))
+				(push regle *re*)
+				;(write "ICI2 ?")
+				(write regle)
+				(explore (eval regle))
+				;(write "ICI 3?")
 				(regles_candidates)
 			)
 		)
