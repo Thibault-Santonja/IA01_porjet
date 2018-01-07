@@ -17,7 +17,8 @@
 
 
 
-(progn
+(progn	; pour tout compiler d'un coup
+
 ;******************************************************
 ;***************** BASE DE REGLES *********************
 ;******************************************************
@@ -28,7 +29,7 @@
 		;********* PÔLE ARTISTIQUE ET ÉVÈNEMENTIEL ************
 		;******************************************************
 
-			(setq R1 '( ((cat ART)) (pole PAE) ) )
+			(setq R1 '( ((cat ART)) (pole PAE) ))
 
 			(setq R11 '( ((pole PAE) (class EVENEMENTIEL)) (type EVENT-ARTISTIQUE) ))
 			(setq R12 '( ((pole PAE) (class SPORTIF)) (type SPORT-ARTISTIQUE) ))
@@ -67,9 +68,6 @@
 			(setq R145 '( ((type MUSIQUE) (genre PIANO))	 (asso PIANO_UT_S) )) ;(PIANO-UT'S (musique piano) ))
 
 
-
-
-
 		;******************************************************
 		;********** PÔLE SOLIDARITÉ ET CITOYENNETÉ ************
 		;******************************************************
@@ -77,8 +75,8 @@
 
 			(setq R2 '( ((cat CITOYENNETE)) (pole PSEC) ))
 
-			(setq R21 '( ((class CITOYENNE) (pole PSEC)) (type AIDE-CITOYENNE) ))
-			(setq R22 '( ((class HUMANITAIRE) (pole PSEC)) (type AIDE-HUMANITAIRE) ))
+			(setq R21 '( ((pole PSEC) (class CITOYENNE)) (type AIDE-CITOYENNE) ))
+			(setq R22 '( ((pole PSEC) (class HUMANITAIRE)) (type AIDE-HUMANITAIRE) ))
 
 
 			;****************** type NUTRITION **********************
@@ -97,9 +95,6 @@
 			(setq R232 '( ((type AIDE-HUMANITAIRE) (pays INDE)) (asso SOLEILS_EN_INDE) )) ;SOLEILS EN INDE (aide inde)
 			(setq R233 '( ((type AIDE-HUMANITAIRE) (pays NEPAL)) (asso TOIT_POUR_LE_NEPAL) )) ;TOIT POUR LE NEPAL (aide nepal)
 			(setq R234 '( ((type AIDE-HUMANITAIRE) (pays AFRIQUE)) (asso UT_AFRICA) )) ;UT'AFRICA (aide afrique)
-
-
-
 
 
 		;******************************************************
@@ -133,13 +128,10 @@
 			(setq R382 '( ((profil TRANSMISSION) (class AUCUNE)) (asso TEDXUTCOMPIÈGNE) ))
 
 
-
-
-
 		;******************************************************
 		;**************** PÔLE VIE DU CAMPUS ******************
 		;******************************************************
-			(setq R4 '( ((cat CAMPUS)) (pole PVC) ))
+			(setq R4 '( ((cat CAMPUS)) (pole VDC) ))
 
 			;****************** type NOURRITURE **********************
 			(setq R401 '( ((pole VDC) (type NOURRITURE) (genre CHARCUTERIE)) (asso CHARCUTC) )) ;CHARC'UTC (nourriture charcuterie)
@@ -172,15 +164,15 @@
 			;****************** type VOYAGE ****************************
 			(setq R461 '( ((pole VDC) (type VOYAGE) (genre STOP)) (asso PTP) )) ;PTP (voyage stop)
 			(setq R462 '( ((pole VDC) (type VOYAGE) (genre HIVER)) (asso SKIUTC) )) ;SKIUTC (sport ski évennement)
-			(setq R463 '( ((pole VDC) (type VOYAGE)) (asso UTRIP) )) ;UTRIP (vayoge)
-			(setq R464 '( ((pole VDC) (type VOYAGE)) (asso WHERE_THE_HELL_IS_UTC) )) ;WHERE THE HELL IS UTC (voyage vidéo)
+			;(setq R463 '( ((pole VDC) (type VOYAGE)) (asso UTRIP) )) ;UTRIP (vayoge)
+			;(setq R464 '( ((pole VDC) (type VOYAGE)) (asso WHERE_THE_HELL_IS_UTC) )) ;WHERE THE HELL IS UTC (voyage vidéo)
 
-			(defvar *regles* 
-				'(R1 R11 R12 R12 R13 R14 R111 R112 R113 R114 R115 R121 R122 R123 R131 R132 R133 R134 R135 R136 R141 R142 R143 R144 R145
-				R2 R211 R212 R221 R222 R223 R224 R225 R231 R232 R233 R234
-				R3 R301 R302 R31 R32 R33 R34 R351 R352 R3611 R3612 R3621 R3622 R371 R372 R381 R382
-				R4 R401 R402 R403 R404 R405 R411 R421 R422 R423 R424 R431 R432 R441 R451 R452 R453 R461 R462 R463 R464)
-			)
+		(defvar *regles* 
+			'(R1 R11 R12 R12 R13 R14 R111 R112 R113 R114 R115 R121 R122 R123 R131 R132 R133 R134 R135 R136 R141 R142 R143 R144 R145
+			R2 R21 R22 R211 R212 R221 R222 R223 R224 R225 R231 R232 R233 R234
+			R3 R301 R302 R31 R32 R33 R34 R351 R352 R3611 R3612 R3621 R3622 R371 R372 R381 R382
+			R4 R401 R402 R403 R404 R405 R411 R421 R422 R423 R424 R431 R432 R441 R451 R452 R453 R461 R462)
+		 )
 	)
 
 
@@ -189,7 +181,6 @@
 ;******************************************************
 
 	(defun artiste()
-		;(setq *bdf* NIL)
 		(setq *bdf* (cons '(cat ART) *bdf*))
 		(write "Que préférez-vous parmis ces choix : EVENEMENTIEL, SPORT, MUSIQUE ou d'autres ART?")
 		(setq class (read))
@@ -218,7 +209,7 @@
 			)
 			((equal class 'SPORT)
 				(progn
-					(setq *bdf* (cons '(class SPORT) *bdf*))
+					(setq *bdf* (cons '(class SPORTIF) *bdf*))
 					(write "Que préférez-vous parmis ces choix : ROCK, SALSA et BREAKDANCE ?")
 					(setq style_danse (read))
 					(cond
@@ -234,7 +225,7 @@
 			)
 			((equal class 'MUSIQUE)
 				(progn
-					(setq *bdf* (cons '(class MUSIQUE) *bdf*))
+					(setq *bdf* (cons '(class MUSICAL) *bdf*))
 					(write "Que préférez-vous parmis ces choix : METAL, ROCK, PIANO, FANFARE et ACOUSTIC ?")
 					(setq genre (read))
 					(cond
@@ -277,7 +268,6 @@
 	)
 
 	(defun citoyen()
-		;(setq *bdf* NIL)
 		(setq *bdf* (cons '(cat CITOYENNETE) *bdf*))
 		(write "Etes vous plutot aide HUMANITAIRE ou vie CITOYENNE?")
 		(setq class (read))
@@ -294,9 +284,9 @@
 								(setq vegan (read))
 								(cond
 									((equal vegan 'OUI)
-										(setq *bdf* (cons '(vegan OUI) *bfd*)))
+										(setq *bdf* (cons '(vegan OUI) *bdf*)))
 									((equal vegan 'NON)
-										(setq *bdf* (cons '(vegan NON) *bfd*)))
+										(setq *bdf* (cons '(vegan NON) *bdf*)))
 									(T (write "ERROR:Vegetarien"))
 								)
 							)
@@ -348,7 +338,6 @@
 	)
 
 	(defun campus()
-		;(setq *bdf* NIL)
 		(setq *bdf* (cons '(cat CAMPUS) *bdf*))
 		(write "Préférez-vous la NOURRITURE, le CINEMA, les JEUX, l'INTEGRATION, la RADIO, le SPORT ou les VOYAGE")
 		(setq type (read))
@@ -445,23 +434,13 @@
 	)
 
 	(defun scientifique()											; Gestion partie PTE
-		;(setq *bdf* NIL)											; déjà présent dans init
 		(setq *bdf* (cons '(cat SCIENCE) *bdf*))					; insertion dans la base de fait de la categorie science (qui amènera à déterminer PTE)
 		(write "Souhaiter vous réaliser / construire / concevoir quelque chose ? OUI / NON")
-		(setq proj (read))											; pour savoir s'il est plutot MAKER ou dans la TRANSMISSION de connaissances
-		;(if 
-		;	(NOT (AND 	(equal proj 'OUI) 
-		;				(equal proj 'NON))
-		;	) 
-		;	(progn 
-		;		(write "ERROR:proj")
-		;		(return-from NULL)
-		;	)
-			(if (equal proj 'OUI)
-				(setq *bdf* (cons '(event NON) *bdf*))				; ajoutons (event *reponse*) à *bdf* (base de fait)
-				(setq *bdf* (cons '(event OUI) *bdf*))
-			)
-		;)
+		(setq proj (read))
+		(if (equal proj 'OUI)
+			(setq *bdf* (cons '(event NON) *bdf*))				; ajoutons (event *reponse*) à *bdf* (base de fait)
+			(setq *bdf* (cons '(event OUI) *bdf*))
+		)
 		(write "Préférez vous ? etre proche des INDUSTRIELS ou un domaine précis tel que la ROBOTIQUE, l'INFORMATIQUE, l'AERONAUTIQUE, la BIOLOGIE ou AUTRE chose encore ?")
 		(setq type (read))
 		(cond
@@ -487,7 +466,6 @@
 				(setq *bdf* (cons '(class AUCUNE) *bdf*))
 			)
 		)
-		; A TESTER NORMALEMENT AVEC TOUT CECI C'EST CENSER FOCNTIONNER
 	)
 
 	(defun debut ()
@@ -667,32 +645,41 @@
 		)
 		(affichage)							; affichage du résultat
 	)
-)
-	; test de fonction testant le retour des moteur d'inférences pour changer l'affichage en fonction de ce retour
-	;(defun start ()
-	;	(init)								; initialisation des listes *bdf* (base de fait) et parcouru
-	;	(debut)								; détermination du profil utilisateur et création des datas dans la base de fait
-	;	(regles_candidates)					; initialisation de *rc*
-	;	(write "PROFONDEUR ou LARGEUR ?")
-	;	(setq chainage (read))
-	;	(let ((return-moteur))
-	;		(if (equal chainage 'PROFONDEUR)
-	;			(setf return-moteur (lancement_moteur_profondeur))
-	;			(setf return-moteur (lancement_moteur_largeur))
-	;		)
-	;		(if (equal return-moteur T)
-	;			(affichage)							; affichage du résultat
-	;			(format T "pas d'asso trouvée vous correspondant")
-	;		)
-	;	)
-	;)
+
+
+
+
+)	;fin du progn pour tout compiler
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 ;******************************************************
 ;******************** BROUILLON ***********************
 ;******************************************************
-
+	#||
 	;PÔLE VIE DU CAMPUS A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE A FAIRE 
 
 	(setq R401 '( ((pole VDC) (nourriture charcuterie)) (asso ) )) ;CHARC'UTC (nourriture charcuterie)
@@ -870,3 +857,26 @@
 				NIL
 			)
 		)
+
+
+
+
+
+	; test de fonction testant le retour des moteur d'inférences pour changer l'affichage en fonction de ce retour
+	;(defun start ()
+	;	(init)								; initialisation des listes *bdf* (base de fait) et parcouru
+	;	(debut)								; détermination du profil utilisateur et création des datas dans la base de fait
+	;	(regles_candidates)					; initialisation de *rc*
+	;	(write "PROFONDEUR ou LARGEUR ?")
+	;	(setq chainage (read))
+	;	(let ((return-moteur))
+	;		(if (equal chainage 'PROFONDEUR)
+	;			(setf return-moteur (lancement_moteur_profondeur))
+	;			(setf return-moteur (lancement_moteur_largeur))
+	;		)
+	;		(if (equal return-moteur T)
+	;			(affichage)							; affichage du résultat
+	;			(format T "pas d'asso trouvée vous correspondant")
+	;		)
+	;	)
+	;)
