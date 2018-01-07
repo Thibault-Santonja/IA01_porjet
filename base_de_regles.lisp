@@ -27,7 +27,7 @@
 		;********* PÔLE ARTISTIQUE ET ÉVÈNEMENTIEL ************
 		;******************************************************
 
-			(setq R1 '( (cat ART) (pole PAE) ) )
+			(setq R1 '( ((cat ART)) (pole PAE) ) )
 
 			(setq R11 '( ((pole PAE) (class EVENEMENTIEL)) (type EVENT-ARTISTIQUE) ))
 			(setq R12 '( ((pole PAE) (class SPORTIF)) (type SPORT-ARTISTIQUE) ))
@@ -74,25 +74,28 @@
 		;******************************************************
 
 
-			(setq R2 '( (cat CITOYENNETE) (pole PSEC) ))
+			(setq R2 '( ((cat CITOYENNETE)) (pole PSEC) ))
+
+			(setq R21 '( ((class CITOYENNE) (pole PSEC)) (type AIDE-CITOYENNE) ))
+			(setq R22 '( ((class HUMANITAIRE) (pole PSEC)) (type AIDE-HUMANITAIRE) ))
 
 
 			;****************** type NUTRITION **********************
-			(setq R211 '( ((pole PSEC) (type AIDE-CITOYENNE) (alimentation OUI) (vegan OUI)) 	(asso AVOCAROTTE) )) ;AVOCAROTTE (nouriture végan)
-			(setq R212 '( ((pole PSEC) (type AIDE-CITOYENNE) (alimentation OUI) (vegan NON)) 	(asso CAC_CAROTTE) )) ;CAC'CAROTTE (nouriture respectueuse vente)
+			(setq R211 '( ((type AIDE-CITOYENNE) (alimentation OUI) (vegan OUI)) 	(asso AVOCAROTTE) )) ;AVOCAROTTE (nouriture végan)
+			(setq R212 '( ((type AIDE-CITOYENNE) (alimentation OUI) (vegan NON)) 	(asso CAC_CAROTTE) )) ;CAC'CAROTTE (nouriture respectueuse vente)
 
-			(setq R221 '( ((pole PSEC) (type AIDE-CITOYENNE) (aide DON-DE-SANG)) (asso DON_UTC) )) ;DON'UTC (Don du sang)
-			(setq R222 '( ((pole PSEC) (type AIDE-CITOYENNE) (aide FINNANCIERE)) (asso EPI) )) ;EPI (aide finnancière)
-			(setq R223 '( ((pole PSEC) (type AIDE-CITOYENNE) (aide HANDICAP)) (asso HANDI_UTC) )) ;HANDI'UTC (aide handicap)
-			(setq R224 '( ((pole PSEC) (type AIDE-CITOYENNE) (aide SECOURISME)) (asso SECOURUT) )) ;SECOURUT'S (sercourisme)
-			(setq R225 '( ((pole PSEC) (type AIDE-CITOYENNE) (aide CITOYENNE)) (asso TUC) )) ;TUC (responsable)
+			(setq R221 '( ((type AIDE-CITOYENNE) (aide DON-DE-SANG)) (asso DON_UTC) )) ;DON'UTC (Don du sang)
+			(setq R222 '( ((type AIDE-CITOYENNE) (aide FINNANCIERE)) (asso EPI) )) ;EPI (aide finnancière)
+			(setq R223 '( ((type AIDE-CITOYENNE) (aide HANDICAP)) (asso HANDI_UTC) )) ;HANDI'UTC (aide handicap)
+			(setq R224 '( ((type AIDE-CITOYENNE) (aide SECOURISME)) (asso SECOURUT) )) ;SECOURUT'S (sercourisme)
+			(setq R225 '( ((type AIDE-CITOYENNE) (aide CITOYENNE)) (asso TUC) )) ;TUC (responsable)
 
 
 			;****************** type HUMANITAIRE **********************
-			(setq R231 '( ((pole PSEC) (type AIDE-HUMANITAIRE) (pays MONDE)) (asso INGÉNIEURS_SANS_FRONTIÈRES) )) ;INGÉNIEURS SANS FRONTIÈRES (aide humanitaire)
-			(setq R232 '( ((pole PSEC) (type AIDE-HUMANITAIRE) (pays INDE)) (asso SOLEILS_EN_INDE) )) ;SOLEILS EN INDE (aide inde)
-			(setq R233 '( ((pole PSEC) (type AIDE-HUMANITAIRE) (pays NEPAL)) (asso TOIT_POUR_LE_NEPAL) )) ;TOIT POUR LE NEPAL (aide nepal)
-			(setq R234 '( ((pole PSEC) (type AIDE-HUMANITAIRE) (pays AFRIQUE) (asso UT_AFRICA) ))) ;UT'AFRICA (aide afrique)
+			(setq R231 '( ((type AIDE-HUMANITAIRE) (pays MONDE)) (asso INGÉNIEURS_SANS_FRONTIÈRES) )) ;INGÉNIEURS SANS FRONTIÈRES (aide humanitaire)
+			(setq R232 '( ((type AIDE-HUMANITAIRE) (pays INDE)) (asso SOLEILS_EN_INDE) )) ;SOLEILS EN INDE (aide inde)
+			(setq R233 '( ((type AIDE-HUMANITAIRE) (pays NEPAL)) (asso TOIT_POUR_LE_NEPAL) )) ;TOIT POUR LE NEPAL (aide nepal)
+			(setq R234 '( ((type AIDE-HUMANITAIRE) (pays AFRIQUE) (asso UT_AFRICA) ))) ;UT'AFRICA (aide afrique)
 
 
 
@@ -102,7 +105,7 @@
 		;******** PÔLE TECHNOLOGIE ET ENTREPRENARIAT **********
 		;******************************************************
 
-			(setq R3 '( (cat SCIENCE) (pole PTE) ))
+			(setq R3 '( ((cat SCIENCE)) (pole PTE) ))
 
 			(setq R301 '( ((event NON) (pole PTE)) (profil MAKER)))
 			(setq R302 '( ((event OUI) (pole PTE)) (profil TRANSMISSION)))
@@ -135,7 +138,7 @@
 		;******************************************************
 		;**************** PÔLE VIE DU CAMPUS ******************
 		;******************************************************
-			(setq R4 '( (cat CAMPUS) (pole PVC)))
+			(setq R4 '( ((cat CAMPUS)) (pole PVC)))
 
 			;****************** type NOURRITURE **********************
 			(setq R401 '( ((pole VDC) (type NOURRITURE) (genre CHARCUTERIE)) (asso CHARCUTC) )) ;CHARC'UTC (nourriture charcuterie)
@@ -552,13 +555,27 @@
 	(defun regles_candidates ()
 		(let ((flag t))
 	        (dolist (regle *regles*)
-	            (dolist pre (premisse regle)
-	            	(if (not (member pre *bdf*)) (setf flag NIL))
+	            (dolist (pre (premisse (eval regle)))
+	            	(write pre)
+	            	(write " - ")
+	            	(if (not (member_bdf pre *bdf*)) (setf flag NIL))
 	            )
-		       	(if (flag) (push regle *rc*))
-		       	(setf flag t)
+	            (write "~%~% - ")
+		       	(if (eq flag T) (push regle *rc*))
+		       	(setf flag T)
 	        )
 	    )
+    )
+
+    (defun member_bdf (premisse *bdf*)
+    	(dolist (fait *bdf*)
+    		(if (equal (car premisse) (car fait))
+    			(if (equal (cdr premisse) (cdr fait))
+    				(return-from member_bdf T)
+    			)
+    		)
+    	)
+    	NIL
     )
 
 	; Ajoute la conclusion d'une règle applicable dans la base de faits
@@ -612,11 +629,8 @@
 
 
 	(defun moteur_largeur_arriere () ; compliqué à faire dans notre cas et avec assez peu d'intéret. (il faudrait lister toutes le asso, qu'on en selectionne une et qu'on lui donn ses gouts => bizarre)
-
-	)
-
-
-
+		NIL
+	 )
 
 
 ;******************************************************
@@ -653,7 +667,9 @@
 
 
 	(defun moteur_profondeur_arriere ()	; compliqué à faire dans notre cas et avec assez peu d'intéret. (il faudrait lister toutes le asso, qu'on en selectionne une et qu'on lui donn ses gouts => bizarre)
-	)
+		NIL
+	 )
+
 
 ;******************************************************
 ;***************** FONCTION "MAIN" ********************
@@ -709,8 +725,8 @@
 
 
 
-	(setq R20 '( (cat SOLIDARITÉ) (pole PSEC) ))
-	(setq R21 '( (cat CITOYENNETÉ) (pole PSEC) ))
+	(setq R20 '( (cat SOLIDARITÉ) ))
+	(setq R21 '( (cat CITOYENNETÉ) ))
 	(setq R30 '( (cat TECHNOLOGIE) (PTE) ))
 	(setq R31 '( (cat ENTREPRENARIAT) (PTE) ))
 	(setq R40 '( (cat VIE-DU-CAMPUS) (PVC) ))
