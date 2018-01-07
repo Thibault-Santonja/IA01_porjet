@@ -17,6 +17,7 @@
 
 
 
+(progn
 ;******************************************************
 ;***************** BASE DE REGLES *********************
 ;******************************************************
@@ -510,34 +511,16 @@
 ;************** FONCTIONS DE SERVICE ******************
 ;******************************************************
 
-	;; initialisation des listes *bdf* (base de fait) et parcouru
-
+	;; initialisation des listes globales utilisés
 	(defun init ()
-		(defvar *parcouru* '())
-		(defvar *bdf* '())
-		(defvar *rc* '())
-		(defvar *re* '())
-		(setq *parcouru* '())
-		(setq *bdf* '())
-		(setq *rc* '())
-		(setq *re* '())
-	 )
-
-
-	;; Verifie si une regle peut etre appliquee a partir de la base de faits
-	(defun verif (R)
-		(dolist (P (premisse (eval R)))
-			(if
-				(not (fait? P)) 
-				(return-from verif nil)
-			)
-		)
-		(return-from verif t)
+		(defparameter *bdf* '())	;*bdf* = base de fait
+		(defparameter *rc* '())		;*rc* = regles candidates
+		(defparameter *re* '())		;*re* = regles explorees
 	 )
 
 	;; Affiche le resultat depuis la base de faits
 	(defun affichage ()
-		(format t "~%~%Suite à toutes vos réponses, nous vous conseillons de rejoindre : ~%~%")
+		(format t "~%~%Suite à toutes vos réponses, nous vous conseillons de rejoindre : ")
 		(dolist (elem *bdf*)
 			(if (equal (car elem) 'ASSO)
 				(write (cdr elem))
@@ -545,59 +528,43 @@
 		)
 	 )
 
-	;; Retourne t si un fait est present dans la base de fait
-	(defun fait? (elem)
-		(dolist (fait *bdf*)
-			(if (equal fait elem) 
-				(return-from fait? t) 
-				nil
-			)
-		)
-	 )
-
 	; Ajoute les regles candidates dans la liste *rc* => regles appliquables à un moment donné 
 	(defun regles_candidates ()
-		(let ((flag t))
-	        (dolist (regle *regles*)
-				;(format t "~% regle : ")
-	    		;(write regle)
-	            (dolist (pre (car (eval regle)))
-					;(format t "~% --- premisse : ")
-	            	;(write pre)
-	            	(if (not (member_bdf pre *bdf*)) (setf flag NIL))
+		(let ((flag t))											; création variable locale flag 
+	        (dolist (regle *regles*)							; pour chaques regles de *regles*
+	            (dolist (premisse (car (eval regle)))			; pour chaques premisses de chaque *regle de regles*
+	            	(if (not (member_bdf premisse *bdf*))		; si la premisse n'est pas dans *bdf*
+	            		(setf flag NIL)							; on set flag à faux
+	            	)
 	            )
-		       	(if (AND (eq flag T) (not (member regle *re*))) (push regle *rc*))
-		       	(setf flag T)
+		       	(if (AND (eq flag T) (not (member regle *re*)))	; si flag n'est pas faux, donc que toutes les prémisses de la régle sont dans *bdf* et que la regle n'a pas encore été explorée
+		       		(push regle *rc*)							; la regle étudié est donc candidate et est placée dans *rc*
+		       	)
+		       	(setf flag T)									; reset du flag à vrai
 	        )
 	    )
     )
 
-    (defun member_bdf (premisse *bdf*)
-    	;(format t "~% member_bdf --- premisse : ")
-	    ;(write premisse)
-    	;(format t "~% member_bdf --- bdf : ")
-	    ;(write *bdf*)
-    	(dolist (fait *bdf*)
-    		;(format t "~% member_bdf --- fait : ")
-	   		;(write fait)
-    		(if (equal (car premisse) (car fait))
-    			(if (equal (cdr premisse) (cdr fait))
-    				(return-from member_bdf T)
+    (defun member_bdf (premisse *bdf*)						; cherche si la premisse envoyé est dans *bdf*
+    	(dolist (fait *bdf*)								; pour chaque fait de la bdf
+    		(if (equal (car premisse) (car fait))			; si la premisse est dans bdf
+    			(if (equal (cdr premisse) (cdr fait))		; et si sa valeur est la même que le fait présent dans la bdf
+    				(return-from member_bdf T)				; alors premisse est dans *bdf*
     			)
     		)
     	)
-    	NIL
+    	NIL 												; si on a tout étudié et on n'a rien trouvé alors la premisse n'est pas dans *bdf*
     )
 
 	; Ajoute la conclusion d'une règle applicable dans la base de faits
     (defun explore (regle)
-    	(reverse *bdf*)
-    	(push (conclu regle) *bdf*)
-    	(reverse *bdf*)
+    	(reverse *bdf*)										; pour garder l'ordre de *bdf* on rverse *bdf*, ainsi les faits les plus récent sont au début
+    	(push (conclu regle) *bdf*)							; on insère le fait au début de *bdf*
+    	(reverse *bdf*)										; on remet *bdf* dans l'ordre de répart
     )
 
 	;; fonctions "peu utile" permettant simplement de mieux comprendre le code
-	(defun premisse (regle)	(car regle)	)	; renvoie la prémisse d'une règle
+	;(defun premisses (regle)	(car regle)	)	; renvoie la prémisse d'une règle
 	(defun conclu (regle) (cadr regle) )	; renvoie la conclusion d'une régle
 
 
@@ -613,29 +580,30 @@
 			(moteur_largeur_avant)
 			(moteur_largeur_arriere)
 		)
-		;(loop while (equal (moteur_profondeur) t) do
-		;	(moteur_profondeur)
-		;	(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
-		;)
 	)
 
 
+	; système de FILE où les regles sont insérée au début et les plus vieille sont testées
 	(defun moteur_largeur_avant ()
 		(let ((regle))
-			(loop while (AND (not (equal *rc* '())) (not (assoc 'asso *bdf*))) do 
-				(setf regle (car *rc*))
-				(reverse *rc*)
-				(setf *rc* (cdr *rc*))
-				(reverse *rc*)
-				(push regle *re*)
-				(explore regle)
-				(regles_candidates)
+			(loop while (AND (not (equal *rc* '())) (not (assoc 'asso *bdf*))) do ; tant qu'il reste des regles candidates
+				(reverse *rc*)				; on reverse *rc* pour prendre la dernière regle 
+				(setf regle (car *rc*))		; on prend la derniere regle (qui est maintenant la première)
+				(setf *rc* (cdr *rc*))		; on supprime cette regle de *rc*
+				(reverse *rc*)				; on remet *rc* à l'endroit
+				(push regle *re*)			; on met cette regle dans les regles explorées
+				(format t " - ")			; affichage de la regle explorée 
+				(write regle)
+				(explore (eval regle))				; on explore la regle pour trouver sa conclusion
+				(regles_candidates)			; on trouve les nouvelles RC
 			)
 		)
-		(if (assoc 'asso *bdf*)
-			T
-			NIL
-		)
+		(format t " - ")
+		; enlever les quotes ci dessous si on utilise l'autre start
+		;(if (assoc 'asso *bdf*)			; si asso est dans bdf on retourne vrai sinon faux		
+		;	(return-from moteur_largeur_avant T)
+		;	(return-from moteur_largeur_avant NIL)
+		;)
 	)
 
 
@@ -654,50 +622,27 @@
 			(moteur_profondeur_avant)
 			(moteur_profondeur_arriere)
 		)
-		;(loop while (equal (moteur_profondeur) t) do
-		;	(moteur_profondeur)
-		;	(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
-		;)
 	)
 
+	; système de PILE où les regles sont insérée au début et les plus récentes sont testées
 	(defun moteur_profondeur_avant ()
 		(let ((regle))
-			(loop while (AND (not (equal *rc* '())) (not (assoc 'asso *bdf*))) do 
+			(loop while (AND (not (equal *rc* '())) (not (assoc 'asso *bdf*))) do  ; tant qu'il reste des regles candidates
 				(setf regle (car *rc*))
 				(setf *rc* (cdr *rc*))
 				(push regle *re*)
-				;(write "ICI2 ?")
+				(format t " - ")
 				(write regle)
 				(explore (eval regle))
-				;(write "ICI 3?")
 				(regles_candidates)
 			)
 		)
-		(if (assoc 'asso *bdf*)
-			T
-			NIL
-		)
-	)
-
-
-	(defun moteur_profondeur_avant ()
-		(let ((regle) (i 0))
-			(loop while (AND (AND (not (equal *rc* '())) (not (assoc 'asso *bdf*))) (< i 6)) do 
-				(setf i (+ i 1))
-				(setf regle (car *rc*))
-				(setf *rc* (cdr *rc*))
-				(push regle *re*)
-				;(write "ICI2 ?")
-				(write regle)
-				(explore (eval regle))
-				;(write "ICI 3?")
-				(regles_candidates)
-			)
-		)
-		(if (assoc 'asso *bdf*)
-			T
-			NIL
-		)
+		(format t " - ")
+		; enlever les quotes ci dessous si on utilise l'autre start
+		;(if (assoc 'asso *bdf*)			; si asso est dans bdf on retourne vrai sinon faux		
+		;	(return-from moteur_profondeur_avant T)
+		;	(return-from moteur_profondeur_avant NIL)
+		;)
 	)
 
 
@@ -713,17 +658,34 @@
 	(defun start ()
 		(init)								; initialisation des listes *bdf* (base de fait) et parcouru
 		(debut)								; détermination du profil utilisateur et création des datas dans la base de fait
-		(regles_candidates)
+		(regles_candidates)					; initialisation de *rc*
 		(write "PROFONDEUR ou LARGEUR ?")
 		(setq chainage (read))
 		(if (equal chainage 'PROFONDEUR)
 			(lancement_moteur_profondeur)
 			(lancement_moteur_largeur)
 		)
-		(affichage)
+		(affichage)							; affichage du résultat
 	)
-
-
+)
+	; test de fonction testant le retour des moteur d'inférences pour changer l'affichage en fonction de ce retour
+	;(defun start ()
+	;	(init)								; initialisation des listes *bdf* (base de fait) et parcouru
+	;	(debut)								; détermination du profil utilisateur et création des datas dans la base de fait
+	;	(regles_candidates)					; initialisation de *rc*
+	;	(write "PROFONDEUR ou LARGEUR ?")
+	;	(setq chainage (read))
+	;	(let ((return-moteur))
+	;		(if (equal chainage 'PROFONDEUR)
+	;			(setf return-moteur (lancement_moteur_profondeur))
+	;			(setf return-moteur (lancement_moteur_largeur))
+	;		)
+	;		(if (equal return-moteur T)
+	;			(affichage)							; affichage du résultat
+	;			(format T "pas d'asso trouvée vous correspondant")
+	;		)
+	;	)
+	;)
 
 
 
@@ -770,10 +732,88 @@
 
 
 	;;; https://github.com/NormandErwan/utc-ia01-expert-system/blob/master/expert-system.cl
-;;; https://github.com/Anaig/IA01/blob/master/systeme.cl
-;;; https://github.com/alexis-ung/diapason/blob/master/TP-3-FINAL.cl
-	(defun moteur_avant_largeur(*regles* *faits*) 	;largeur
-		(let ((bf *faits*) (br *regles*) (ok NIL))
+	;;; https://github.com/Anaig/IA01/blob/master/systeme.cl
+	;;; https://github.com/alexis-ung/diapason/blob/master/TP-3-FINAL.cl
+		(defun moteur_avant_largeur(*regles* *faits*) 	;largeur
+			(let ((bf *faits*) (br *regles*) (ok NIL))
+				(while (null (cdr (assoc 'genre bf))) 
+					(setq ok NIL)
+					(dolist (r br)
+						(if (applicable (eval r) *faits*)
+							(progn
+								(setq ok t)
+								(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))   
+								(setq br (remove r br))  	;supprimer regle de br 
+								)
+							)
+						)
+					(if (equal ok NIL) (return-from moteur_avant_largeur (format t "Le moteur n'a pas pu trouver de genre correspondant dans la base de donnees~&~&")))
+				)
+
+				(if (member (cadr (assoc 'genre bf)) gSousgenres)
+					(if (not (null (cdr (assoc 'sous-genre *faits*))))
+						(return-from moteur_avant_largeur (format t "~& ~& Le sous-genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'sous-genre *faits*))))
+						(dolist (r br)
+							(if (and (applicable (eval r) *faits* ) (member (assoc 'genre bf) (car (eval r)) :test #'equal))
+								(progn
+									(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))
+									(return-from moteur_avant_profondeur (format t "~& ~& Le sous-genre de la musique est : ~a ~& ~& ~&"(car (but (eval r)))))
+								)
+							)
+						)
+					)
+				)
+				(format t "~& ~& Le genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'genre bf)))
+			)
+		)
+
+
+	#||
+		;; Tant qu'il y a une règle candidate à tester, on relance moteur_profondeur
+		(defun lancement_moteur_profondeur ()
+			(loop while (equal (moteur_profondeur) t) do
+				(moteur_profondeur)
+				(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
+			)
+		)
+
+		;; Parcourt l'arbre depuis la debut et s'arrete a la premiere regle candidate
+		(defun moteur_profondeur ()
+			(dolist (regle *regles*)
+				(write "2")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
+				(cond 
+					(
+						(and (not (member regle *parcouru*)) (equal (verif regle) t))
+						(dolist (conclusion (conclu (eval regle)))
+							(push conclusion *bdf*)
+						)
+						(push regle *parcouru*)
+						(return-from moteur_profondeur t)
+					)
+					(t nil)
+				)
+			) 
+			nil
+		) 
+	||#
+
+
+
+
+		(defun lancement_moteur_profondeur ()
+			(write "AVANT ou ARRIERE ?")
+			(setq chainage (read))
+			(if (equal chainage 'AVANT)
+				(moteur_profondeur_avant)
+				(moteur_profondeur_arriere)
+			)
+			(loop while (equal (moteur_profondeur) t) do
+				(moteur_profondeur)
+				(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
+			)
+		)
+
+		(defun moteur_profondeur_avant ()
 			(while (null (cdr (assoc 'genre bf))) 
 				(setq ok NIL)
 				(dolist (r br)
@@ -781,109 +821,52 @@
 						(progn
 							(setq ok t)
 							(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))   
-							(setq br (remove r br))  	;supprimer regle de br 
+							(setq br (remove r br))  	;supprimer regle de br
+							(return-from moteur_avant_profondeur (moteur_avant_profondeur br bf))
 							)
 						)
 					)
-				(if (equal ok NIL) (return-from moteur_avant_largeur (format t "Le moteur n'a pas pu trouver de genre correspondant dans la base de donnees~&~&")))
+				(if (equal ok NIL) (return-from moteur_avant_profondeur (format t "Le moteur n'a pas pu trouver de genre correspondant dans la base de donnees~&~&")))
 			)
 
 			(if (member (cadr (assoc 'genre bf)) gSousgenres)
-				(if (not (null (cdr (assoc 'sous-genre *faits*))))
-					(return-from moteur_avant_largeur (format t "~& ~& Le sous-genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'sous-genre *faits*))))
-					(dolist (r br)
-						(if (and (applicable (eval r) *faits* ) (member (assoc 'genre bf) (car (eval r)) :test #'equal))
-							(progn
-								(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))
-								(return-from moteur_avant_profondeur (format t "~& ~& Le sous-genre de la musique est : ~a ~& ~& ~&"(car (but (eval r)))))
+				(dolist (r br )				(if (and (applicable (eval r) *faits* ) (member (assoc 'genre bf) (car (eval r)) :test #'equal))
+						(progn
+							(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))
+							(return-from moteur_avant_profondeur (format t "~& ~& Le sous-genre de la musique est : ~a ~& ~& ~&"(car (but (eval r)))))
 							)
-						)
 					)
 				)
 			)
 			(format t "~& ~& Le genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'genre bf)))
 		)
-	)
-
-
-#||
-	;; Tant qu'il y a une règle candidate à tester, on relance moteur_profondeur
-	(defun lancement_moteur_profondeur ()
-		(loop while (equal (moteur_profondeur) t) do
-			(moteur_profondeur)
-			(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
-		)
-	)
-
-	;; Parcourt l'arbre depuis la debut et s'arrete a la premiere regle candidate
-	(defun moteur_profondeur ()
-		(dolist (regle *regles*)
-			(write "2")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
-			(cond 
-				(
-					(and (not (member regle *parcouru*)) (equal (verif regle) t))
-					(dolist (conclusion (conclu (eval regle)))
-						(push conclusion *bdf*)
-					)
-					(push regle *parcouru*)
-					(return-from moteur_profondeur t)
-				)
-				(t nil)
-			)
-		) 
-		nil
-	) 
-||#
 
 
 
+ 
 
-	(defun lancement_moteur_profondeur ()
-		(write "AVANT ou ARRIERE ?")
-		(setq chainage (read))
-		(if (equal chainage 'AVANT)
-			(moteur_profondeur_avant)
-			(moteur_profondeur_arriere)
-		)
-		(loop while (equal (moteur_profondeur) t) do
-			(moteur_profondeur)
-			(write "1")	; A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   A SUPPRIMER POUR DEBOGGER   ---   
-		)
-	)
-
-	(defun moteur_profondeur_avant ()
-		(while (null (cdr (assoc 'genre bf))) 
-			(setq ok NIL)
-			(dolist (r br)
-				(if (applicable (eval r) *faits*)
-					(progn
-						(setq ok t)
-						(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))   
-						(setq br (remove r br))  	;supprimer regle de br
-						(return-from moteur_avant_profondeur (moteur_avant_profondeur br bf))
-						)
-					)
-				)
-			(if (equal ok NIL) (return-from moteur_avant_profondeur (format t "Le moteur n'a pas pu trouver de genre correspondant dans la base de donnees~&~&")))
+		(progn 
+			(setq re 400)
+			(loop while (< re 450) do (write re) (setf re (+ re 1)))
 		)
 
-		(if (member (cadr (assoc 'genre bf)) gSousgenres)
-			(dolist (r br )				(if (and (applicable (eval r) *faits* ) (member (assoc 'genre bf) (car (eval r)) :test #'equal))
-					(progn
-						(setf (cdr (assoc (enonce_but (eval r)) bf)) (but (eval r)))
-						(return-from moteur_avant_profondeur (format t "~& ~& Le sous-genre de la musique est : ~a ~& ~& ~&"(car (but (eval r)))))
-						)
+
+		(defun moteur_profondeur_avant ()
+			(let ((regle) (i 0))
+				(loop while (AND (AND (not (equal *rc* '())) (not (assoc 'asso *bdf*))) (< i 6)) do 
+					(setf i (+ i 1))
+					(setf regle (car *rc*))
+					(setf *rc* (cdr *rc*))
+					(push regle *re*)
+					;(write "ICI2 ?")
+					(write regle)
+					(explore (eval regle))
+					;(write "ICI 3?")
+					(regles_candidates)
 				)
 			)
+			(if (assoc 'asso *bdf*)
+				T
+				NIL
+			)
 		)
-		(format t "~& ~& Le genre de la musique est : ~a ~& ~& ~&"(cadr (assoc 'genre bf)))
-	)
-
-
-
-
-
-	(progn 
-		(setq re 400)
-		(loop while (< re 450) do (write re) (setf re (+ re 1)))
-	)
